@@ -43,12 +43,13 @@ while true; do
 
 		3)
 			echo " "
-			read -p "Pleae enter the 'movie id' (1~1682): " movie_id
-			echo " "
+			read -p "Please enter the 'movie id' (1~1682): " movie_id
 			sum=0
 			counter=0
-			average=$(cat "$u_data" | awk -v movie_id="$movie_id" -F "\t" '$2==movie_id {sum+=$3; counter++} END {printf sum/counter}')
-			printf "\naverage rating of $movie_id: %.5f\n" "$average"
+			average=$(cat "$u_data" | awk -v movie_id="$movie_id" -F "\t" \
+				'$2==movie_id {sum+=$3; counter++} END {printf "%.5f", sum/counter}')
+			printf "\naverage rating of $movie_id : $average"
+			echo " "
 			;;
 
 		4)
@@ -64,7 +65,9 @@ while true; do
 			read -p "Do you want to get the data about users from 'u.user'? (y/n) : " y_n
 			echo " "
 			if [ "$y_n" == 'y' ]; then 
-				cat "$u_user" | sed -E 's/^([0-9]+)\|([0-9]+)\|([MF]?)\|([a-z]+)\|([0-9]+)$/user \1 is \2 years old \3 \4/g' | sed -E 's/M/male/g;s/F/female/g' | head -n 10
+				cat "$u_user" \
+					| sed -E 's/^([0-9]+)\|([0-9]+)\|([MF]?)\|([a-z]+)\|([0-9]+)$/user \1 is \2 years old \3 \4/g' \
+					| sed -E 's/M/male/g;s/F/female/g' | head -n 10
 			fi
 			;;
 
@@ -73,7 +76,11 @@ while true; do
 			read -p "Do you want to Modify the format of 'release data' in 'u.item'? (y/n) : " y_n
 			echo " "
 			if [ "$y_n" == 'y' ]; then
-				cat "$u_item" | sed -E 's/Jan/01/g;s/Feb/02/g;s/Mar/03/g;s/Apr/04/g;s/May/05/g;s/Jun/06/g;s/Jul/07/g;s/Aug/08/g;s/Sep/09/g;s/Oct/10/g;s/Nov/11/g;s/Dec/12/g' | sed -E 's/([0-9]{2})\-([0-9]{2})\-([0-9]{4})/\3\2\1/g' | sed -n '1673,1682p'
+				cat "$u_item" | sed -E 's/Jan/01/g;s/Feb/02/g;s/Mar/03/g;s/Apr/04/g;
+					s/May/05/g;s/Jun/06/g;s/Jul/07/g;s/Aug/08/g;s/Sep/09/g;
+					s/Oct/10/g;s/Nov/11/g;s/Dec/12/g' \
+					| sed -E 's/([0-9]{2})\-([0-9]{2})\-([0-9]{4})/\3\2\1/g' \
+					| sed -n '1673,1682p'
 			fi
 			;;
 
@@ -82,7 +89,8 @@ while true; do
 			read -p "Please enter the 'user id' (1~943) : " user_id
 			echo " "
 
-			movie_list=$( cat "$u_data" | awk -v user_id="$user_id" -F "\t" '$1==user_id {print $2}' | sort -n | tr "\n" "|" | sed 's/|$//') 
+			movie_list=$( cat "$u_data" | awk -v user_id="$user_id" -F "\t" '$1==user_id {print $2}'\
+				| sort -n | tr "\n" "|" | sed 's/|$//') 
 
 			echo "$movie_list"
 			echo " "
@@ -102,7 +110,8 @@ while true; do
 			;;
 		
 		8)
-			read -p "Do you want to get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer'? (y/n): " y_n
+			read -p "Do you want to get the average 'rating' of movies rated by users with 'age'\
+				between 20 and 29 and 'occupation' as 'programmer'? (y/n): " y_n
 			echo " "
 			if [ $y_n == 'y' ]; then
 				user_list=$( cat "$u_user" | awk -F "|" '$4=="programmer" && $2>=20 && $2<=29 {print $1}' | sort -n ) 
@@ -110,7 +119,8 @@ while true; do
 				u_list=$(echo $user_list | tr " " "\n")
 
 				for user in $u_list; do
-					cat "$u_data" | awk -v user=$user -F "\t" '$1==user {print $2"|"$3}' | sort -n >> movie_rate.txt
+					cat "$u_data" | awk -v user=$user -F "\t" '$1==user {print $2"|"$3}' \
+						| sort -n >> movie_rate.txt
 				done
 				
 				movie_rate="movie_rate.txt"
@@ -136,5 +146,10 @@ while true; do
 			echo "Exiting the program."
 			exit
 			;;
+
+		*)
+			
+			echo " "
+			echo "Invalid number! Please enter valid number(1-9)"
 	esac
 done
