@@ -110,8 +110,7 @@ while true; do
 			;;
 		
 		8)
-			read -p "Do you want to get the average 'rating' of movies rated by users with 'age'\
-				between 20 and 29 and 'occupation' as 'programmer'? (y/n): " y_n
+			read -p "Do you want to get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer'? (y/n): " y_n
 			echo " "
 			if [ $y_n == 'y' ]; then
 				user_list=$( cat "$u_user" | awk -F "|" '$4=="programmer" && $2>=20 && $2<=29 {print $1}' | sort -n ) 
